@@ -6,12 +6,12 @@ from trans import transliteration_dict
 
 def trans_checker(word: str) -> typing.Tuple[int, typing.Any]:
     
-    LIGAL = ['-', '–','`',"'"]
+    divisio_etc = ('-', '–','`',"'")
 
     _word = []
     
     for index, _symbol in enumerate(word):
-        if _symbol in LIGAL:
+        if _symbol in divisio_etc:
             _word.append(_symbol)
         else:
             try:
