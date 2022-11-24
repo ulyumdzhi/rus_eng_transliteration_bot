@@ -1,5 +1,7 @@
 import os
 import logging
+import asyncio
+from string import punctuation
 
 from aiogram import Bot, Dispatcher, executor, types
 
@@ -7,14 +9,12 @@ from trans import FAIL
 from utils import trans_checker
 
 
-TOKEN = os.getenv("TOKEN")
-
-
 HELLO = """Если вы покупаете авиабилет на внутренний паспорт или свидетельство \
 о рождении, вы можете внести данные латинскими буквами, используя правила \
 транслитерации, установленные Приказом МИД России от 12.02.2020 № 2113. \
-
-Отправь мне полное ФИО и я транслитерирую их в соответствии с правилами."""
+\n
+*Отправь мне ФИО на русском (кириллицей)*
+A я транслитерирую их в соответствии с [правилами](https://www.consultant.ru/document/cons_doc_LAW_360580/9eb761ae644ec1e283b3a50ef232330b924577cb/)."""
 
 
 logging.basicConfig(level=logging.INFO, 
@@ -30,19 +30,27 @@ async def send_welcome(message: types.Message):
     user_id = message.from_user.id
     text = f'Привет, {user_name}!'
     logging.info(f'Start message from {user_name=}, {user_id=}')
+    
     await message.reply(text)
-    await bot.send_message(user_id, HELLO)
+    await asyncio.sleep(2)
+    await bot.send_message(user_id, HELLO, 
+                           parse_mode='Markdown',
+                           disable_web_page_preview=True)
+    
     
 @dp.message_handler()
 async def translit_this(message):
     chat_id = message.from_user.id
     fio = message.text
+    fio = [word.upper() for word in fio.split()]
+       
     logging.info(f'{fio=} from {chat_id=}')
     translit = ' '
     _translit = []
     try:
-        for word in fio.split():
+        for word in fio:
             code, result = trans_checker(word)
+            
             if code:
                 _translit.append(result)
             else:
