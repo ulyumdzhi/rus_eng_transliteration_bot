@@ -20,6 +20,8 @@ A я транслитерирую их в соответствии с [прав�
 logging.basicConfig(level=logging.INFO, 
                     filename='translit.log')
 
+TOKEN = os.environ['TOKEN']
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
